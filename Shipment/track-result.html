@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shipment Status | All India Delivery Service</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .result-box {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .result-box h2 {
+      color: #003366;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #444;
+    }
+    .track-another {
+      margin-top: 40px;
+    }
+    .track-another p {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #555;
+    }
+    .track-another button {
+      padding: 10px 20px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .track-another button:hover {
+      background-color: #0059b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="result-box">
+    <h2>Shipment Status</h2>
+    <p id="trackingCode" class="status"></p>
+    <div id="shipmentData" class="status">
+      Loading shipment updates...
+    </div>
+
+    <!-- Track another section -->
+    <div class="track-another">
+      <p>Want to search another shipment?</p>
+      <button onclick="window.location.href='tracking.html'">Track Another Shipment</button>
+    </div>
+  </div>
+
+  <script>
+    const code = new URLSearchParams(window.location.search).get('code');
+    document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
+
+    const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
+
+    fetch(sheetURL)
+      .then(res => res.json())
+      .then(data => {
+        const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
+
+        if (shipment) {
+        document.getElementById('shipmentData').innerHTML = `
+  <p><strong>Status:</strong> ${shipment.Status}</p>
+  <p><strong>Date Updated:</strong> ${shipment.Date}</p>
+  <p><strong>Last Location:</strong> ${shipment.Location}</p>
+  <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+`;
+
+        } else {
+          document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
+        console.error(err);
+      });
+  </script>
+
+</body>
+</html>
