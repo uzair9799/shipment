@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shipment Status | All India Delivery Service</title>
   <style>
     body {
@@ -27,8 +27,14 @@
       font-size: 18px;
       color: #444;
     }
-    .track-another {
+    .confirmation {
       margin-top: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      color: green;
+    }
+    .track-another {
+      margin-top: 50px;
     }
     .track-another p {
       margin-bottom: 10px;
@@ -45,8 +51,52 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .track-another button:hover {
-      background-color: #0059b3;
+
+    /* Modal */
+    #paymentModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #paymentModal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+    #paymentModal .modal-content img {
+      width: 200px;
+      height: auto;
+      margin: 20px 0;
+    }
+    #paymentModal .modal-content button.close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ccc;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #paymentModal .modal-content a button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #003366;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -55,26 +105,8 @@
   <div class="result-box">
     <h2>Shipment Status</h2>
     <p id="trackingCode" class="status"></p>
-    <div id="shipmentData" class="status">
-      Loading shipment updates...
-    </div>
-<!-- Modal Popup -->
-<div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; text-align:center; position:relative;">
-    <button onclick="closeModal()" style="position:absolute; top:10px; right:10px; background:#ccc; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">X</button>
-    <img src="radaar.jpg" alt="UPI QR Code" style="width:200px; height:auto; margin:20px 0;">
-    <p>Scan this to pay</p>
-    <br>
-    <p>Pay using UPI App</p>
-    <a href="upi://pay?pa=indiadelivery@digikhata&pn=AllIndiaDelivery&cu=INR" style="text-decoration:none;">
-      <button style="margin-top:10px; padding:10px 20px; background:#003366; color:#fff; border:none; border-radius:5px; cursor:pointer;">
-        Open UPI App
-      </button>
-    </a>
-  </div>
-</div>
+    <div id="shipmentData" class="status">Loading shipment updates...</div>
 
-    
     <!-- Track another section -->
     <div class="track-another">
       <p>Want to search another shipment?</p>
@@ -82,53 +114,71 @@
     </div>
   </div>
 
- <script>
-  const code = new URLSearchParams(window.location.search).get('code');
-  document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
+  <!-- Payment Modal -->
+  <div id="paymentModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">X</button>
+      <img src="radaar.jpg" alt="UPI QR Code" />
+      <p>Scan the above QR and pay</p>
+      <br />
+      <p>Or download this QR code and scan with UPI apps.</p>
+      <a href="radaar.jpg" download="AllIndiaDelivery-UPI-QR.jpg">
+        <button>Download QR Code</button>
+      </a>
+    </div>
+  </div>
 
-  const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
+  <script>
+    const code = new URLSearchParams(window.location.search).get('code');
+    document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
 
-  fetch(sheetURL)
-    .then(res => res.json())
-    .then(data => {
-      const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
+    const sheetURL = 'https://opensheet.vercel.app/YOUR_SHEET_ID/Sheet1'; // Replace with your actual Sheet ID
 
-      if (shipment) {
-        let output = `
-          <p><strong>Status:</strong> ${shipment.Status}</p>
-          <p><strong>Date Updated:</strong> ${shipment.Date}</p>
-          <p><strong>Last Location:</strong> ${shipment.Location}</p>
-          <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-        `;
+    fetch(sheetURL)
+      .then(res => res.json())
+      .then(data => {
+        const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
 
-        // Check if Pay Now is set
-        if (shipment["Pay Now"] && shipment["Pay Now"].toLowerCase().includes("pay")) {
-          output += `
-            <p><button onclick="openModal()" style="margin-top:20px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-              Pay Now
-            </button></p>
+        if (shipment) {
+          let output = `
+            <p><strong>Status:</strong> ${shipment.Status}</p>
+            <p><strong>Date Updated:</strong> ${shipment.Date}</p>
+            <p><strong>Last Location:</strong> ${shipment.Location}</p>
+            <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
           `;
+
+          const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
+
+          if (paymentStatus === "pay now") {
+            output += `
+              <div style="margin-top: 30px;">
+                <button onclick="openModal()" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+                  Pay Now
+                </button>
+              </div>
+            `;
+          } else if (paymentStatus === "paid") {
+            output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
+          }
+
+          document.getElementById('shipmentData').innerHTML = output;
+        } else {
+          document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
         }
+      })
+      .catch(err => {
+        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
+        console.error(err);
+      });
 
-        document.getElementById('shipmentData').innerHTML = output;
-      } else {
-        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
-      }
-    })
-    .catch(err => {
-      document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
-      console.error(err);
-    });
+    function openModal() {
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
 
-  function openModal() {
-    document.getElementById('paymentModal').style.display = 'flex';
-  }
-
-  function closeModal() {
-    document.getElementById('paymentModal').style.display = 'none';
-  }
-</script>
-
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+    }
+  </script>
 
 </body>
 </html>
