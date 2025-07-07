@@ -82,34 +82,53 @@
     </div>
   </div>
 
-  <script>
-    const code = new URLSearchParams(window.location.search).get('code');
-    document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
+ <script>
+  const code = new URLSearchParams(window.location.search).get('code');
+  document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
 
-    const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
+  const sheetURL = 'https://opensheet.vercel.app/YOUR_SHEET_ID/Sheet1';
 
-    fetch(sheetURL)
-      .then(res => res.json())
-      .then(data => {
-        const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
+  fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+      const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
 
-        if (shipment) {
-        document.getElementById('shipmentData').innerHTML = `
-  <p><strong>Status:</strong> ${shipment.Status}</p>
-  <p><strong>Date Updated:</strong> ${shipment.Date}</p>
-  <p><strong>Last Location:</strong> ${shipment.Location}</p>
-  <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-`;
+      if (shipment) {
+        let output = `
+          <p><strong>Status:</strong> ${shipment.Status}</p>
+          <p><strong>Date Updated:</strong> ${shipment.Date}</p>
+          <p><strong>Last Location:</strong> ${shipment.Location}</p>
+          <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+        `;
 
-        } else {
-          document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
+        // Check if Pay Now is set
+        if (shipment["Pay Now"] && shipment["Pay Now"].toLowerCase().includes("pay")) {
+          output += `
+            <p><button onclick="openModal()" style="margin-top:20px; padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+              Pay Now
+            </button></p>
+          `;
         }
-      })
-      .catch(err => {
-        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
-        console.error(err);
-      });
-  </script>
+
+        document.getElementById('shipmentData').innerHTML = output;
+      } else {
+        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
+      }
+    })
+    .catch(err => {
+      document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
+      console.error(err);
+    });
+
+  function openModal() {
+    document.getElementById('paymentModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+  }
+</script>
+
 
 </body>
 </html>
