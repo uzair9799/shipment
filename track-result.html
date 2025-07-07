@@ -86,7 +86,7 @@
   const code = new URLSearchParams(window.location.search).get('code');
   document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
 
-  const sheetURL = 'https://opensheet.vercel.app/YOUR_SHEET_ID/Sheet1';
+  const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
 
   fetch(sheetURL)
     .then(res => res.json())
