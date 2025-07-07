@@ -149,17 +149,26 @@
 
           const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
 
-          if (paymentStatus === "pay now") {
-            output += `
-              <div style="margin-top: 30px;">
-                <button onclick="openModal()" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-                  Pay Now
-                </button>
-              </div>
-            `;
-          } else if (paymentStatus === "paid") {
-            output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
-          }
+      let qrImage = "";
+
+if (paymentStatus === "pay now") {
+  qrImage = "radaar.jpg";
+} else if (paymentStatus === "pay500") {
+  qrImage = "500.jpg";
+}
+
+if (qrImage) {
+  output += `
+    <div style="margin-top: 30px;">
+      <button onclick="openModal('${qrImage}')" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+        Pay Now
+      </button>
+    </div>
+  `;
+} else if (paymentStatus === "paid") {
+  output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
+}
+
 
           document.getElementById('shipmentData').innerHTML = output;
         } else {
@@ -171,13 +180,16 @@
         console.error(err);
       });
 
-    function openModal() {
-      document.getElementById('paymentModal').style.display = 'flex';
-    }
+function openModal(qrImage) {
+  document.querySelector("#paymentModal img").src = qrImage;
+  document.querySelector("#paymentModal a").href = qrImage;
+  document.getElementById('paymentModal').style.display = 'flex';
+}
 
-    function closeModal() {
-      document.getElementById('paymentModal').style.display = 'none';
-    }
+function closeModal() {
+  document.getElementById('paymentModal').style.display = 'none';
+}
+
   </script>
 
 </body>
