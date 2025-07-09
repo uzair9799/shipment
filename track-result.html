@@ -98,6 +98,22 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    .loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #003366;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
   </style>
 </head>
 <body>
@@ -105,7 +121,11 @@
   <div class="result-box">
     <h2>Shipment Status</h2>
     <p id="trackingCode" class="status"></p>
-    <div id="shipmentData" class="status">Loading shipment updates...</div>
+    <div id="shipmentData" class="status">
+  <div class="loader"></div>
+  <p>Loading shipment updates...</p>
+</div>
+
 
     <!-- Track another section -->
     <div class="track-another">
