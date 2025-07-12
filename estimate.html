@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Estimate Delivery | All India Delivery Service</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -40,7 +38,7 @@
       font-size: 15px;
     }
 
-    input, select {
+    input {
       width: 100%;
       padding: 10px 12px;
       margin-top: 6px;
@@ -50,7 +48,7 @@
       transition: border-color 0.3s;
     }
 
-    input:focus, select:focus {
+    input:focus {
       border-color: #003366;
       outline: none;
     }
@@ -70,17 +68,9 @@
     }
 
     @media screen and (max-width: 480px) {
-      .container {
-        padding: 20px 15px;
-      }
-
-      h2 {
-        font-size: 20px;
-      }
-
-      .price {
-        font-size: 18px;
-      }
+      .container { padding: 20px 15px; }
+      h2 { font-size: 20px; }
+      .price { font-size: 18px; }
     }
   </style>
 </head>
@@ -95,8 +85,8 @@
       maxlength="6"
       inputmode="numeric"
       pattern="[0-9]*"
-      oninput="updateStateCode(this, 'senderState')"
       placeholder="Enter 6-digit PIN code"
+      onblur="fetchState(this.value, 'senderState')"
     />
     <div id="senderState" class="info"></div>
 
@@ -107,31 +97,45 @@
       maxlength="6"
       inputmode="numeric"
       pattern="[0-9]*"
-      oninput="updateStateCode(this, 'receiverState')"
       placeholder="Enter 6-digit PIN code"
+      onblur="fetchState(this.value, 'receiverState')"
     />
     <div id="receiverState" class="info"></div>
 
-    <label for="parcelSize">Parcel Size</label>
-    <select id="parcelSize">
-      <option value="Small">Small</option>
-      <option value="Medium">Medium</option>
-      <option value="Large">Large</option>
-      <option value="Oversized">Oversized</option>
-    </select>
+    <label for="parcelSize">Parcel Size (in cm or kg)</label>
+    <input type="text" id="parcelSize" placeholder="e.g. 30x20x15 cm or 2kg" />
 
     <div class="price">Estimated Delivery Price: ₹1060</div>
   </div>
 
   <script>
-    function updateStateCode(input, targetId) {
-      const val = input.value.trim();
-      if (val.length === 6 && /^\d{6}$/.test(val)) {
-        const stateCode = "PIN-" + val.substring(0, 3);
-        document.getElementById(targetId).innerText = "State Code: " + stateCode;
-      } else {
-        document.getElementById(targetId).innerText = "";
+    function fetchState(pincode, targetId) {
+      const infoBox = document.getElementById(targetId);
+      infoBox.innerText = "";
+
+      if (!/^\d{6}$/.test(pincode)) {
+        infoBox.innerText = "Please enter a valid 6-digit PIN code.";
+        return;
       }
+
+      fetch("https://api.postalpincode.in/pincode/" + pincode)
+        .then(res => res.json())
+        .then(data => {
+          if (
+            data[0].Status === "Success" &&
+            data[0].PostOffice &&
+            data[0].PostOffice.length > 0
+          ) {
+            const state = data[0].PostOffice[0].State;
+            const district = data[0].PostOffice[0].District;
+            infoBox.innerText = `📍 State: ${state}, District: ${district}`;
+          } else {
+            infoBox.innerText = "Could not find state info for this PIN.";
+          }
+        })
+        .catch(() => {
+          infoBox.innerText = "Error fetching state info.";
+        });
     }
   </script>
 </body>
