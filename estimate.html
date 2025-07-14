@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Estimate Delivery | All India Delivery Service</title>
+  <title>Estimate Delivery Cost | All India Delivery Service</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -59,12 +59,37 @@
       font-size: 14px;
     }
 
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background: #003366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #002244;
+    }
+
     .price {
+      display: none;
       text-align: center;
       margin-top: 30px;
       font-size: 20px;
       color: green;
       font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .price.visible {
+      display: block;
+      opacity: 1;
     }
 
     @media screen and (max-width: 480px) {
@@ -76,7 +101,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Estimate Delivery</h2>
+    <h2>Delivery Cost</h2>
 
     <label for="senderPin">Sender's PIN Code</label>
     <input
@@ -105,7 +130,9 @@
     <label for="parcelSize">Parcel Size (in cm or kg)</label>
     <input type="text" id="parcelSize" placeholder="e.g. 30x20x15 cm or 2kg" />
 
-    <div class="price">Estimated Delivery Price: ₹1060</div>
+    <button onclick="showEstimate()">Get Estimate</button>
+
+    <div class="price" id="estimatePrice">Estimated Delivery Price: ₹1060</div>
   </div>
 
   <script>
@@ -136,6 +163,11 @@
         .catch(() => {
           infoBox.innerText = "Error fetching state info.";
         });
+    }
+
+    function showEstimate() {
+      const priceBox = document.getElementById("estimatePrice");
+      priceBox.classList.add("visible");
     }
   </script>
 </body>
