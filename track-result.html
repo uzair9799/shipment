@@ -52,6 +52,21 @@
       font-size: 16px;
     }
 
+    /* Loading spinner */
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #003366;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* Modal */
     #paymentModal {
       display: none;
@@ -98,22 +113,6 @@
       font-weight: bold;
       cursor: pointer;
     }
-
-    .loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #003366;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
   </style>
 </head>
 <body>
@@ -122,10 +121,9 @@
     <h2>Shipment Status</h2>
     <p id="trackingCode" class="status"></p>
     <div id="shipmentData" class="status">
-  <div class="loader"></div>
-  <p>Loading shipment updates...</p>
-</div>
-
+      <div class="loader"></div>
+      <p>Loading shipment updates...</p>
+    </div>
 
     <!-- Track another section -->
     <div class="track-another">
@@ -138,11 +136,11 @@
   <div id="paymentModal">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal()">X</button>
-      <img src="radaar.jpg" alt="UPI QR Code" />
+      <img id="qrImage" src="radaar.jpg" alt="UPI QR Code" />
       <p>Scan the above QR and pay</p>
       <br />
       <p>Or download this QR code and scan with UPI apps.</p>
-      <a href="radaar.jpg" download="AllIndiaDelivery-UPI-QR.jpg">
+      <a id="qrDownload" href="radaar.jpg" download="AllIndiaDelivery-UPI-QR.jpg">
         <button>Download QR Code</button>
       </a>
     </div>
@@ -152,7 +150,7 @@
     const code = new URLSearchParams(window.location.search).get('code');
     document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
 
-    const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1'; // Replace with your actual Sheet ID
+    const sheetURL = 'https://opensheet.vercel.app/YOUR_SHEET_ID/Sheet1'; // Replace with your real Sheet ID
 
     fetch(sheetURL)
       .then(res => res.json())
@@ -160,35 +158,40 @@
         const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
 
         if (shipment) {
+          const istDate = new Date().toLocaleDateString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          });
+
           let output = `
             <p><strong>Status:</strong> ${shipment.Status}</p>
-            <p><strong>Date Updated:</strong> ${shipment.Date}</p>
+            <p><strong>Date Updated:</strong> ${istDate}</p>
             <p><strong>Last Location:</strong> ${shipment.Location}</p>
             <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
           `;
 
           const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
+          let qrImage = "";
 
-      let qrImage = "";
+          if (paymentStatus === "pay now") {
+            qrImage = "radaar.jpg";
+          } else if (paymentStatus === "pay500") {
+            qrImage = "500.jpg";
+          }
 
-if (paymentStatus === "pay now") {
-  qrImage = "radaar.jpg";
-} else if (paymentStatus === "pay500") {
-  qrImage = "500.jpg";
-}
-
-if (qrImage) {
-  output += `
-    <div style="margin-top: 30px;">
-      <button onclick="openModal('${qrImage}')" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-        Pay Now
-      </button>
-    </div>
-  `;
-} else if (paymentStatus === "paid") {
-  output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
-}
-
+          if (qrImage) {
+            output += `
+              <div style="margin-top: 30px;">
+                <button onclick="openModal('${qrImage}')" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+                  Pay Now
+                </button>
+              </div>
+            `;
+          } else if (paymentStatus === "paid") {
+            output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
+          }
 
           document.getElementById('shipmentData').innerHTML = output;
         } else {
@@ -200,16 +203,15 @@ if (qrImage) {
         console.error(err);
       });
 
-function openModal(qrImage) {
-  document.querySelector("#paymentModal img").src = qrImage;
-  document.querySelector("#paymentModal a").href = qrImage;
-  document.getElementById('paymentModal').style.display = 'flex';
-}
+    function openModal(qr) {
+      document.getElementById('qrImage').src = qr;
+      document.getElementById('qrDownload').href = qr;
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
 
-function closeModal() {
-  document.getElementById('paymentModal').style.display = 'none';
-}
-
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+    }
   </script>
 
 </body>
