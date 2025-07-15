@@ -176,10 +176,12 @@
           let qrImage = "";
 
           if (paymentStatus === "pay now") {
-            qrImage = "radaar.jpg";
-          } else if (paymentStatus === "pay500") {
-            qrImage = "500.jpg";
-          }
+  qrImage = "radaar.jpg";
+} else if (paymentStatus === "pay500") {
+  qrImage = "500.jpg";
+} else if (paymentStatus === "payair") {
+  qrImage = "payair.jpg";
+}
 
           if (qrImage) {
             output += `
