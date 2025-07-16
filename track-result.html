@@ -158,19 +158,37 @@
         const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
 
         if (shipment) {
-          const istDate = new Date().toLocaleDateString("en-IN", {
-            timeZone: "Asia/Kolkata",
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-          });
+          // Today's date in IST
+const now = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+const today = new Date(now);
+
+// Format today’s date
+const istDate = today.toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+});
+
+// Add 8 days for estimated delivery
+const estimatedDate = new Date(today);
+estimatedDate.setDate(today.getDate() + 8);
+
+const deliveryDate = estimatedDate.toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+});
+
 
           let output = `
-            <p><strong>Status:</strong> ${shipment.Status}</p>
-            <p><strong>Date Updated:</strong> ${istDate}</p>
-            <p><strong>Last Location:</strong> ${shipment.Location}</p>
-            <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-          `;
+           output += `
+  <p><strong>Status:</strong> ${shipment.Status}</p>
+  <p><strong>Date Updated:</strong> ${istDate}</p>
+  <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
+  <p><strong>Last Location:</strong> ${shipment.Location}</p>
+  <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+`;
+
 
           const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
           let qrImage = "";
