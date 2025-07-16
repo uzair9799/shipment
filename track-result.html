@@ -175,7 +175,7 @@ if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].t
   deliveryDate = shipment["Estimated Delivery Date"].trim();
 } else {
   const estimated = new Date(today);
-  estimated.setDate(today.getDate() + 8);
+  estimated.setDate(today.getDate() + 10);
   deliveryDate = estimated.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
