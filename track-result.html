@@ -201,13 +201,14 @@ if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].t
 
 
 
-          let output = `
+let output = `
   <p><strong>Status:</strong> ${shipment.Status}</p>
   <p><strong>Date Updated:</strong> ${istDate}</p>
   <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
   <p><strong>Last Location:</strong> ${shipment.Location}</p>
   <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
 `;
+
 
 
 
