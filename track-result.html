@@ -170,18 +170,35 @@ const istDate = today.toLocaleDateString("en-IN", {
 });
 
 // Estimate delivery date logic
+// ✅ Get the "Date Updated" from the sheet
+let istDate = shipment["Date"] 
+  ? new Date(shipment["Date"]).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    })
+  : "Not Available";
+
+// ✅ Calculate Estimated Delivery Date
 let deliveryDate = "";
 if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].trim() !== "") {
+  // Use the date from the sheet if provided
   deliveryDate = shipment["Estimated Delivery Date"].trim();
 } else {
-  const estimated = new Date(today);
-  estimated.setDate(today.getDate() + 10);
-  deliveryDate = estimated.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
+  // If not provided, calculate +8 days from the Date column
+  if (shipment["Date"]) {
+    const baseDate = new Date(shipment["Date"]);
+    baseDate.setDate(baseDate.getDate() + 8);
+    deliveryDate = baseDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  } else {
+    deliveryDate = "Not Available";
+  }
 }
+
 
 
           let output = `
