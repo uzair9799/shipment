@@ -169,59 +169,28 @@ const istDate = today.toLocaleDateString("en-IN", {
   year: "numeric"
 });
 
-// ✅ Safe date parsing function (handles DD/MM/YYYY from Google Sheets)
-function parseDate(dateString) {
-  if (!dateString) return null;
-  
-  // If date looks like DD/MM/YYYY, convert it to YYYY-MM-DD for JS
-  if (dateString.includes("/") && dateString.split("/").length === 3) {
-    const parts = dateString.split("/");
-    // parts[0] = DD, parts[1] = MM, parts[2] = YYYY
-    return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-  }
-  
-  // Try default parsing for other formats
-  return new Date(dateString);
-}
-
-// ✅ Get the date from sheet safely
-const sheetDate = parseDate(shipment["Date"]);
-let istDate = sheetDate 
-  ? sheetDate.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    })
-  : "Not Available";
-
-// ✅ Estimated Delivery Date Logic
+// Estimate delivery date logic
 let deliveryDate = "";
 if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].trim() !== "") {
   deliveryDate = shipment["Estimated Delivery Date"].trim();
 } else {
-  if (sheetDate) {
-    const estimated = new Date(sheetDate);
-    estimated.setDate(sheetDate.getDate() + 8);
-    deliveryDate = estimated.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    });
-  } else {
-    deliveryDate = "Not Available";
-  }
+  const estimated = new Date(today);
+  estimated.setDate(today.getDate() + 10);
+  deliveryDate = estimated.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
 }
 
 
-
-let output = `
+          let output = `
   <p><strong>Status:</strong> ${shipment.Status}</p>
   <p><strong>Date Updated:</strong> ${istDate}</p>
   <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
   <p><strong>Last Location:</strong> ${shipment.Location}</p>
   <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
 `;
-
 
 
 
