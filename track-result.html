@@ -171,15 +171,18 @@
         }
       }
 
-      // ✅ Shipment details
-      let output = `
-        <h3>Shipment Details for ID: ${trackingID}</h3>
-        <p><strong>Status:</strong> ${shipment.Status}</p>
-        <p><strong>Date Updated:</strong> ${istDate}</p>
-        <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
-        <p><strong>Last Location:</strong> ${shipment.Location}</p>
-        <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-      `;
+     // ✅ Shipment details (in your requested order)
+let output = `
+  <h3>Shipment Details</h3>
+  <p><strong>Tracking ID:</strong> ${trackingID}</p>
+  <p><strong>Receiver's Name:</strong> ${shipment["Receiver's Name"] || 'Not Available'}</p>
+  <p><strong>Status:</strong> ${shipment.Status}</p>
+  <p><strong>Date Updated:</strong> ${istDate}</p>
+  <p><strong>Location:</strong> ${shipment.Location}</p>
+  <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+  <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
+`;
+
 
       // ✅ Payment Section
       if (shipment["Pay Now"] && shipment["Pay Now"].trim() !== "" && shipment["Pay Now"].toLowerCase() !== "paid") {
