@@ -173,8 +173,7 @@
 
      // ✅ Shipment details (in your requested order)
 let output = `
-  <h3>Shipment Details</h3>
-  <p><strong>Tracking ID:</strong> ${trackingID}</p>
+  <h3>Shipment Details For Tracking ID:${trackingID}</h3>
   <p><strong>Receiver's Name:</strong> ${shipment["Receiver's Name"] || 'Not Available'}</p>
   <p><strong>Status:</strong> ${shipment.Status}</p>
   <p><strong>Date Updated:</strong> ${istDate}</p>
