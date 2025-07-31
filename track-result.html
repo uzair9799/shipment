@@ -116,7 +116,7 @@
   const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
 
   const urlParams = new URLSearchParams(window.location.search);
-  const trackingID = urlParams.get('id');
+  const trackingID = urlParams.get('id') || urlParams.get('code');
 
   const box = document.getElementById('trackingBox');
 
