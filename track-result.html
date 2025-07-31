@@ -1,218 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shipment Status | All India Delivery Service</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipment Tracking - All India Delivery Service</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      padding: 40px 20px;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background: #222;
+      color: white;
+      padding: 10px;
       text-align: center;
     }
-    .result-box {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .result-box h2 {
-      color: #003366;
-    }
-    .status {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #444;
-    }
-    .confirmation {
-      margin-top: 40px;
-      font-size: 18px;
-      font-weight: bold;
-      color: green;
-    }
-    .track-another {
-      margin-top: 50px;
-    }
-    .track-another p {
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: #555;
-    }
-    .track-another button {
-      padding: 10px 20px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    /* Loading spinner */
-    .loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #003366;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Modal */
-    #paymentModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #paymentModal .modal-content {
+    .tracking-box {
+      max-width: 500px;
+      margin: 50px auto;
       background: white;
       padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
       text-align: center;
-      position: relative;
     }
-    #paymentModal .modal-content img {
-      width: 200px;
-      height: auto;
-      margin: 20px 0;
+    .loading {
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+      animation: blink 1s infinite;
     }
-    #paymentModal .modal-content button.close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #ccc;
+    @keyframes blink {
+      50% { opacity: 0.4; }
+    }
+    .pay-btn {
+      background: #ff6600;
+      color: white;
+      padding: 10px 15px;
       border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
       cursor: pointer;
-    }
-    #paymentModal .modal-content a button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #003366;
-      color: #fff;
-      border: none;
       border-radius: 5px;
       font-weight: bold;
+      margin-top: 15px;
+    }
+    .pay-btn:hover {
+      background: #e65c00;
+    }
+    .back-btn {
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
       cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 320px;
+      text-align: center;
+    }
+    .close {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    img.qr-code {
+      width: 250px;
+      margin: 15px 0;
     }
   </style>
 </head>
 <body>
 
-  <div class="result-box">
-    <h2>Shipment Status</h2>
-    <p id="trackingCode" class="status"></p>
-    <div id="shipmentData" class="status">
-      <div class="loader"></div>
-      <p>Loading shipment updates...</p>
-    </div>
+<header>
+  <h2>All India Delivery Service</h2>
+</header>
 
-    <!-- Track another section -->
-    <div class="track-another">
-      <p>Want to search another shipment?</p>
-      <button onclick="window.location.href='tracking.html'">Track Another Shipment</button>
-    </div>
+<div class="tracking-box" id="trackingBox">
+  <p class="loading">Loading shipment update...</p>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h3>Complete Your Payment</h3>
+    <img id="qrImage" class="qr-code" src="" alt="UPI QR Code">
+    <p>Scan the above QR to pay</p>
+    <p style="margin-top: 10px;">or download this QR code and scan with UPI apps.</p>
+    <button id="downloadQR" class="pay-btn">Download QR Code</button>
+    <p id="paidMessage" style="color: green; font-weight: bold; display: none; margin-top: 15px;">✅ Payment Completed</p>
   </div>
+</div>
 
-  <!-- Payment Modal -->
-  <div id="paymentModal">
-    <div class="modal-content">
-      <button class="close-btn" onclick="closeModal()">X</button>
-      <img id="qrImage" src="radaar.jpg" alt="UPI QR Code" />
-      <p>Scan the above QR and pay</p>
-      <br />
-      <p>Or download this QR code and scan with UPI apps.</p>
-      <a id="qrDownload" href="radaar.jpg" download="AllIndiaDelivery-UPI-QR.jpg">
-        <button>Download QR Code</button>
-      </a>
-    </div>
-  </div>
+<script>
+  // ✅ REPLACE THIS WITH YOUR SHEET LINK
+  const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
 
-  <script>
-    const code = new URLSearchParams(window.location.search).get('code');
-    document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackingID = urlParams.get('id');
 
-    const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1';
+  const box = document.getElementById('trackingBox');
 
-    fetch(sheetURL)
-      .then(res => res.json())
-      .then(data => {
-        const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
+  // ✅ Safe date parsing function
+  function parseDate(dateString) {
+    if (!dateString) return null;
 
-        if (shipment) {
-          const istDate = new Date().toLocaleDateString("en-IN", {
-            timeZone: "Asia/Kolkata",
+    // If date looks like DD/MM/YYYY, convert to YYYY-MM-DD
+    if (dateString.includes("/") && dateString.split("/").length === 3) {
+      const parts = dateString.split("/");
+      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    }
+
+    return new Date(dateString);
+  }
+
+  fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+      const shipment = data.find(item => item["Tracking ID"] === trackingID);
+
+      if (!shipment) {
+        box.innerHTML = `<p>❌ No shipment found for ID: <strong>${trackingID}</strong></p>`;
+        return;
+      }
+
+      // ✅ Parse "Date" from sheet
+      const sheetDate = parseDate(shipment["Date"]);
+      let istDate = sheetDate
+        ? sheetDate.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          })
+        : "Not Available";
+
+      // ✅ Estimate Delivery Date Logic
+      let deliveryDate = "";
+      if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].trim() !== "") {
+        deliveryDate = shipment["Estimated Delivery Date"].trim();
+      } else {
+        if (sheetDate) {
+          const estimated = new Date(sheetDate);
+          estimated.setDate(sheetDate.getDate() + 8);
+          deliveryDate = estimated.toLocaleDateString("en-IN", {
             day: "2-digit",
             month: "short",
             year: "numeric"
           });
-
-          let output = `
-            <p><strong>Status:</strong> ${shipment.Status}</p>
-            <p><strong>Date Updated:</strong> ${istDate}</p>
-            <p><strong>Last Location:</strong> ${shipment.Location}</p>
-            <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-          `;
-
-          const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
-          let qrImage = "";
-
-          if (paymentStatus === "pay now") {
-            qrImage = "radaar.jpg";
-          } else if (paymentStatus === "pay500") {
-            qrImage = "500.jpg";
-          }
-
-          if (qrImage) {
-            output += `
-              <div style="margin-top: 30px;">
-                <button onclick="openModal('${qrImage}')" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-                  Pay Now
-                </button>
-              </div>
-            `;
-          } else if (paymentStatus === "paid") {
-            output += `<div class="confirmation">✅ Payment received successfully. Thank you!</div>`;
-          }
-
-          document.getElementById('shipmentData').innerHTML = output;
         } else {
-          document.getElementById('shipmentData').innerHTML = `<span style="color:red;">No record found for Tracking ID: ${code}</span>`;
+          deliveryDate = "Not Available";
         }
-      })
-      .catch(err => {
-        document.getElementById('shipmentData').innerHTML = `<span style="color:red;">Error fetching data. Please try again later.</span>`;
-        console.error(err);
-      });
+      }
 
-    function openModal(qr) {
-      document.getElementById('qrImage').src = qr;
-      document.getElementById('qrDownload').href = qr;
-      document.getElementById('paymentModal').style.display = 'flex';
-    }
+      // ✅ Shipment details
+      let output = `
+        <h3>Shipment Details for ID: ${trackingID}</h3>
+        <p><strong>Status:</strong> ${shipment.Status}</p>
+        <p><strong>Date Updated:</strong> ${istDate}</p>
+        <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
+        <p><strong>Last Location:</strong> ${shipment.Location}</p>
+        <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+      `;
 
-    function closeModal() {
-      document.getElementById('paymentModal').style.display = 'none';
-    }
-  </script>
+      // ✅ Payment Section
+      if (shipment["Pay Now"] && shipment["Pay Now"].trim() !== "" && shipment["Pay Now"].toLowerCase() !== "paid") {
+        let qrImage = "";
+
+        if (shipment["Pay Now"] === "pay now") {
+          qrImage = "radaar.jpg";
+        } else if (shipment["Pay Now"] === "pay500") {
+          qrImage = "500.jpg";
+        } else if (shipment["Pay Now"] === "payair") {
+          qrImage = "payair.jpg";
+        }
+
+        if (qrImage) {
+          output += `<button class="pay-btn" onclick="openPaymentModal('${qrImage}')">💳 Pay Now</button>`;
+        }
+      }
+
+      // ✅ Paid Confirmation
+      if (shipment["Pay Now"] && shipment["Pay Now"].toLowerCase() === "paid") {
+        output += `<p style="color:green; font-weight:bold; margin-top:20px;">✅ Payment Received</p>`;
+      }
+
+      // ✅ Add Track Another Shipment Button
+      output += `<button class="back-btn" onclick="window.location.href='tracking.html'">Track Another Shipment</button>`;
+
+      box.innerHTML = output;
+    })
+    .catch(err => {
+      console.error(err);
+      box.innerHTML = `<p>⚠️ Error fetching data. Please try again later.</p>`;
+    });
+
+  // ✅ Payment Modal Functions
+  function openPaymentModal(qrFile) {
+    document.getElementById("qrImage").src = qrFile;
+    document.getElementById("paymentModal").style.display = "block";
+
+    // download qr button
+    document.getElementById("downloadQR").onclick = function() {
+      const link = document.createElement("a");
+      link.href = qrFile;
+      link.download = qrFile;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      document.getElementById("paidMessage").style.display = "block";
+    };
+  }
+
+  document.getElementById("closeModal").onclick = function() {
+    document.getElementById("paymentModal").style.display = "none";
+  };
+</script>
 
 </body>
 </html>
