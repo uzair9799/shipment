@@ -150,7 +150,7 @@
     const code = new URLSearchParams(window.location.search).get('code');
     document.getElementById('trackingCode').innerText = `Tracking ID: ${code}`;
 
-    const sheetURL = 'https://opensheet.vercel.app/1uOWYSzDNmEFifqHd-Kbu47cIZ8Kzg36raSPccrEPg0g/Sheet1'; // Replace with your real Sheet ID
+    const sheetURL = 'https://opensheet.vercel.app/YOUR_SHEET_ID/Sheet1'; // Replace with your real Sheet ID
 
     fetch(sheetURL)
       .then(res => res.json())
@@ -158,52 +158,28 @@
         const shipment = data.find(row => row["Tracking ID"].toUpperCase() === code.toUpperCase());
 
         if (shipment) {
-// Get today's date in IST
-const now = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-const today = new Date(now);
-
-// Format IST "Date Updated"
-const istDate = today.toLocaleDateString("en-IN", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric"
-});
-
-// Estimate delivery date logic
-let deliveryDate = "";
-if (shipment["Estimated Delivery Date"] && shipment["Estimated Delivery Date"].trim() !== "") {
-  deliveryDate = shipment["Estimated Delivery Date"].trim();
-} else {
-  const estimated = new Date(today);
-  estimated.setDate(today.getDate() + 10);
-  deliveryDate = estimated.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-}
-
+          const istDate = new Date().toLocaleDateString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          });
 
           let output = `
-  <p><strong>Status:</strong> ${shipment.Status}</p>
-  <p><strong>Date Updated:</strong> ${istDate}</p>
-  <p><strong>Estimated Delivery Date:</strong> ${deliveryDate}</p>
-  <p><strong>Last Location:</strong> ${shipment.Location}</p>
-  <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
-`;
-
-
+            <p><strong>Status:</strong> ${shipment.Status}</p>
+            <p><strong>Date Updated:</strong> ${istDate}</p>
+            <p><strong>Last Location:</strong> ${shipment.Location}</p>
+            <p><strong>Remark:</strong> ${shipment.Remark || 'No additional remark'}</p>
+          `;
 
           const paymentStatus = (shipment["Pay Now"] || "").toLowerCase().trim();
           let qrImage = "";
 
           if (paymentStatus === "pay now") {
-  qrImage = "radaar.jpg";
-} else if (paymentStatus === "paydigi") {
-  qrImage = "500.jpg";
-} else if (paymentStatus === "payair") {
-  qrImage = "payair.png";
-}
+            qrImage = "radaar.jpg";
+          } else if (paymentStatus === "pay500") {
+            qrImage = "500.jpg";
+          }
 
           if (qrImage) {
             output += `
